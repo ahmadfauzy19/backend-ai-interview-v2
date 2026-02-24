@@ -2,6 +2,7 @@ package com.interview.ai_interview.controllers;
 
 import com.interview.ai_interview.dto.request.CreateInterviewRequest;
 import com.interview.ai_interview.dto.response.InterviewResponse;
+import com.interview.ai_interview.dto.response.InterviewDetailResponse;
 import com.interview.ai_interview.services.InterviewService;
 
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class InterviewController {
     }
 
     @GetMapping("/{id}")
-    public InterviewResponse getById(@PathVariable UUID id) {
+    public InterviewDetailResponse getById(@PathVariable UUID id) {
         return interviewService.getById(id);
     }
 

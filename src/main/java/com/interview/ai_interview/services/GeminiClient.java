@@ -26,16 +26,14 @@ public class GeminiClient {
     /**
      * Kirim prompt ke Gemini dan ambil text response
      */
-    public String evaluate(String prompt) {
-        if (this.client == null) {
-            System.err.println("GeminiClient not available; returning fallback score '0'.");
-            return "0";
-        }
+    public String evaluate(String systemPrompt, String userPrompt) {
+
+        String finalPrompt = systemPrompt + "\n\n" + userPrompt;
 
         GenerateContentResponse response =
                 client.models.generateContent(
                         model,
-                        prompt,
+                        finalPrompt,
                         null
                 );
 

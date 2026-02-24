@@ -14,9 +14,12 @@ CREATE TABLE users (
 CREATE TABLE interviews (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
+    context TEXT NOT NULL,
     objective TEXT NOT NULL,
-    mode VARCHAR(50) NOT NULL, -- INTERNAL_ASSESSMENT, HIRING
+    role_target VARCHAR(100) NOT NULL,
+    level_target VARCHAR(100) NOT NULL,
+    technology VARCHAR(100) NOT NULL,
+    purpose VARCHAR(50) NOT NULL, -- INTERNAL_ASSESSMENT, HIRING
     status VARCHAR(50) DEFAULT 'DRAFT',
     created_by UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -60,11 +63,7 @@ CREATE TABLE questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     interview_id UUID NOT NULL,
     question_text TEXT NOT NULL,
-    role_target VARCHAR(100),
-    level_target VARCHAR(100),
-    technology VARCHAR(100),
     order_number INT NOT NULL,
-    generated_by_ai BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_question_interview
         FOREIGN KEY (interview_id) REFERENCES interviews(id)
@@ -78,11 +77,7 @@ CREATE TABLE answers (
     question_id UUID NOT NULL,
     audio_path VARCHAR(500),
     transcript TEXT,
-    technical_score FLOAT,
-    clarity_score FLOAT,
-    depth_score FLOAT,
-    structure_score FLOAT,
-    final_score FLOAT,
+    score FLOAT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_answer_participant
         FOREIGN KEY (participant_id) REFERENCES interview_participants(id)
