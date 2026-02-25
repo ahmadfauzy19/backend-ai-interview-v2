@@ -1,4 +1,4 @@
-name: Deploy AI Interview V2 (Development)
+name: Deploy Backend V2 (Development)
 
 on:
   push:
@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -20,11 +17,12 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to VM
+      - name: Deploy Backend
         run: |
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            cd /opt/ai-interview-v2
+            cd /opt/ai-interview-v2/backend-ai-interview-v2
             git pull origin development
-            docker compose down
-            docker compose up -d --build
+            cd ..
+            docker compose build backend
+            docker compose up -d backend
           EOF
