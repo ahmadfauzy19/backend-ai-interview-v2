@@ -37,7 +37,7 @@ public class InterviewServiceImpl implements InterviewService {
     @Transactional(rollbackFor = Exception.class)
     public InterviewResponse createInterview(CreateInterviewRequest request) {
 
-        // 1️⃣ Save Interview
+        
         Interview interview = Interview.builder()
                 .name(request.getName())
                 .context(request.getContext())
@@ -53,7 +53,7 @@ public class InterviewServiceImpl implements InterviewService {
 
         Interview savedInterview = interviewRepository.save(interview);
 
-        // 2️⃣ Generate AI Request
+        // Generate AI Request
         GenerateQuestionRequest generateRequest =
                 fromInterview(savedInterview, request.getNumber());
 
@@ -76,7 +76,7 @@ public class InterviewServiceImpl implements InterviewService {
                 throw new RuntimeException("AI generated no questions");
             }
 
-            // 3️⃣ Save Questions (batch save)
+            // Save Questions (batch save)
             List<Question> questionList = new ArrayList<>();
 
             int order = 1;
