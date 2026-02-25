@@ -28,7 +28,8 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/logout",
                     "/api/interviews/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/v3/api-docs"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
