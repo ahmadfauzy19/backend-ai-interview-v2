@@ -32,7 +32,8 @@ CREATE TABLE interviews (
 CREATE TABLE candidates (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL UNIQUE,
-    current_level VARCHAR(100),
+    role VARCHAR(50),
+    experience_years VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_candidate_user
         FOREIGN KEY (user_id) REFERENCES users(id)
