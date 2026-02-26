@@ -39,21 +39,21 @@ public class AnswerController {
     ) {
         try {
 
-            // // 1️⃣ Ambil question
-            // Question question = questionRepository
-            //         .findById(questionId)
-            //         .orElseThrow(() -> new RuntimeException("Question not found"));
+            // // Ambil question
+            Question question = questionRepository
+                    .findById(questionId)
+                    .orElseThrow(() -> new RuntimeException("Question not found"));
 
-            // // 2️⃣ Ambil interview dari question
-            // Interview interview = question.getInterview();
+            // // Ambil interview dari question
+            Interview interview = question.getInterview();
 
-            // // 3️⃣ Dummy candidate (sementara ambil 1 saja)
+            // // Dummy candidate (sementara ambil 1 saja)
             // Candidate candidate = candidateRepository.findAll()
             //         .stream()
             //         .findFirst()
             //         .orElseThrow(() -> new RuntimeException("No candidate found"));
 
-            // // 4️⃣ Buat InterviewParticipant dummy
+            // // Buat InterviewParticipant dummy
             // InterviewParticipant participant = InterviewParticipant.builder()
             //         .interview(interview)
             //         .candidate(candidate)
