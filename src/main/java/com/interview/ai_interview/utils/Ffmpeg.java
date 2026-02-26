@@ -16,19 +16,15 @@ public class Ffmpeg {
 
     public static void cutAudio(
         String inputAudio,
-        String outputAudio,
-        double start,
-        double end
+        String outputAudio
     ) throws Exception {
 
-        String startStr = String.valueOf(start);
-        String durationStr = String.valueOf(end - start);
+        // String startStr = String.valueOf(start);
+        // String durationStr = String.valueOf(end - start);
 
         ProcessBuilder pb = new ProcessBuilder(
             "ffmpeg", "-y",
-            "-ss", startStr,
             "-i", inputAudio,
-            "-t", durationStr,
             "-af", "afftdn",
             "-acodec", "pcm_s16le",
             outputAudio

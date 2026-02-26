@@ -1,4 +1,4 @@
-package com.interview.ai_interview.services;
+package com.interview.ai_interview.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interview.ai_interview.dto.request.CreateInterviewRequest;
@@ -12,6 +12,8 @@ import com.interview.ai_interview.models.InterviewStatus;
 import com.interview.ai_interview.models.Question;
 import com.interview.ai_interview.repositories.InterviewRepository;
 import com.interview.ai_interview.repositories.QuestionRepository;
+import com.interview.ai_interview.services.GeminiClient;
+import com.interview.ai_interview.services.InterviewService;
 import com.interview.ai_interview.utils.PromtingGenerateQuestion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,6 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public InterviewResponse createInterview(CreateInterviewRequest request) {
-
-        
         Interview interview = Interview.builder()
                 .name(request.getName())
                 .context(request.getContext())

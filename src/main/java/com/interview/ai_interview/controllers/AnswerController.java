@@ -1,15 +1,6 @@
 package com.interview.ai_interview.controllers;
 
-import com.interview.ai_interview.models.Answer;
-import com.interview.ai_interview.models.Interview;
-import com.interview.ai_interview.models.InterviewParticipant;
-import com.interview.ai_interview.models.Question;
-import com.interview.ai_interview.models.Candidate;
-import com.interview.ai_interview.repositories.AnswerRepository;
-import com.interview.ai_interview.repositories.InterviewParticipantRepository;
-import com.interview.ai_interview.repositories.QuestionRepository;
-import com.interview.ai_interview.repositories.CandidateRepository;
-import com.interview.ai_interview.services.MinioService;
+import com.interview.ai_interview.services.AnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,65 +14,18 @@ import org.springframework.http.MediaType;
 @RequiredArgsConstructor
 public class AnswerController {
 
-    private final MinioService minioService;
-    private final InterviewParticipantRepository participantRepository;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
-    private final CandidateRepository candidateRepository;
+    private final AnswerService answerService;
 
-    @PostMapping(
+@PostMapping(
         value = "/upload",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    public ResponseEntity<String> uploadAnswer(
-            @RequestParam("video") MultipartFile video,
-            @RequestParam("questionId") UUID questionId
-    ) {
-        try {
-
-            // // Ambil question
-            Question question = questionRepository
-                    .findById(questionId)
-                    .orElseThrow(() -> new RuntimeException("Question not found"));
-
-            // // Ambil interview dari question
-            Interview interview = question.getInterview();
-
-            // // Dummy candidate (sementara ambil 1 saja)
-            // Candidate candidate = candidateRepository.findAll()
-            //         .stream()
-            //         .findFirst()
-            //         .orElseThrow(() -> new RuntimeException("No candidate found"));
-
-            // // Buat InterviewParticipant dummy
-            // InterviewParticipant participant = InterviewParticipant.builder()
-            //         .interview(interview)
-            //         .candidate(candidate)
-            //         .startedAt(LocalDateTime.now())
-            //         .totalScore(null) // kosong
-            //         .finalRecommendation(null) // kosong
-            //         .build();
-
-            // participantRepository.save(participant);
-
-            // 5️⃣ Upload video ke MinIO
-            String storedFileName = minioService.uploadFile(video);
-
-            // // 6️⃣ Simpan Answer
-            // Answer answer = Answer.builder()
-            //         .participant(participant)
-            //         .question(question)
-            //         .audioPath(storedFileName)
-            //         .createdAt(LocalDateTime.now())
-            //         .build();
-
-            // answerRepository.save(answer);
-
-            return ResponseEntity.ok("Berhasil upload jawaban");
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Gagal upload jawaban: " + e.getMessage());
-        }
-    }
+)
+public ResponseEntity<String> uploadAnswer(
+        @RequestParam("video") MultipartFile video,
+        @RequestParam("questionId") UUID questionId,
+        @RequestParam("userId") UUID userId
+) {
+    answerService.uploadAnswer(video, questionId, userId);
+    return ResponseEntity.ok("Berhasil upload jawaban");
+}
 }

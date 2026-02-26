@@ -1,7 +1,9 @@
 package com.interview.ai_interview.services;
 
 import com.interview.ai_interview.models.User;
+import com.interview.ai_interview.models.Candidate;
 import com.interview.ai_interview.repositories.UserRepository;
+import com.interview.ai_interview.repositories.CandidateRepository;
 import com.interview.ai_interview.security.JwtSecurity;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +19,7 @@ import com.interview.ai_interview.dto.request.RegisterRequest;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CandidateRepository candidateRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtSecurity jwtSecurity;
 
@@ -32,8 +35,18 @@ public class UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
-
+        
         userRepository.save(user);
+
+        if (request.getRole().name().equals("CANDIDATE")) {
+            Candidate candidate = Candidate.builder()
+                    .user(user)
+                    .role(request.getRole_candidate())
+                    .experienceYears(request.getExperience_years())
+                    .build();
+
+            candidateRepository.save(candidate);
+        }
     }
 
     public AuthResponse login(LoginRequest request) {

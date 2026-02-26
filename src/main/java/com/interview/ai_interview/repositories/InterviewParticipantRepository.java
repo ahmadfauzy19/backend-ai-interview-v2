@@ -9,6 +9,6 @@ import java.util.UUID;
 @Repository
 public interface InterviewParticipantRepository
         extends JpaRepository<InterviewParticipant, UUID> {
-
+    Optional<InterviewParticipant> findByInterviewIdAndCandidateId(UUID interviewId, UUID candidateId);
     Optional<InterviewParticipant> findByInterview_Id(UUID interviewId);
 }
