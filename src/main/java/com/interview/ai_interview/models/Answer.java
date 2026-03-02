@@ -35,6 +35,13 @@ public class Answer {
     @Column(columnDefinition = "TEXT")
     private String transcript;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TranscriptStatusEnum status;
+
+    @Column(nullable = false)
+    private Integer retryCount;
+
     private Float score;
 
     @Column(name = "created_at")

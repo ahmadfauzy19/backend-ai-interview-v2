@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
+import java.io.File;
 
 @Service
 @RequiredArgsConstructor
@@ -31,5 +32,21 @@ public class MinioService {
         );
 
         return fileName;
+    }
+
+    public File downloadToTempFile(String objectName) throws Exception {
+        // File tempFile = File.createTempFile("minio-", "-" + UUID.randomUUID() + ".mp4");
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String fileName = "minio-" + UUID.randomUUID() + ".mp4";
+
+        File tempFile = new File(tempDir, fileName);
+        minioClient.downloadObject(
+                io.minio.DownloadObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(objectName)
+                        .filename(tempFile.getAbsolutePath())
+                        .build()
+        );
+        return tempFile;
     }
 }

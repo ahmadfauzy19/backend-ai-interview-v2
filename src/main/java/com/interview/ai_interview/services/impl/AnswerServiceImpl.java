@@ -5,14 +5,15 @@ import com.interview.ai_interview.models.Candidate;
 import com.interview.ai_interview.models.Interview;
 import com.interview.ai_interview.models.InterviewParticipant;
 import com.interview.ai_interview.models.Question;
+import com.interview.ai_interview.models.TranscriptStatusEnum;
 import com.interview.ai_interview.repositories.AnswerRepository;
 import com.interview.ai_interview.repositories.CandidateRepository;
 import com.interview.ai_interview.repositories.InterviewParticipantRepository;
 import com.interview.ai_interview.repositories.QuestionRepository;
 import com.interview.ai_interview.services.AnswerService;
 import com.interview.ai_interview.services.MinioService;
-import com.interview.ai_interview.utils.Ffmpeg;
-import com.interview.ai_interview.client.SttClient;
+// import com.interview.ai_interview.utils.Ffmpeg;
+// import com.interview.ai_interview.client.SttClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final CandidateRepository candidateRepository;
     private final InterviewParticipantRepository participantRepository;
     private final AnswerRepository answerRepository;
-    private final SttClient sttClient;
+//     private final SttClient sttClient;
 
     @Override
     @Transactional
@@ -39,19 +40,14 @@ public class AnswerServiceImpl implements AnswerService {
         File tempVideo = null;
         File tempAudio = null;
         try {
-                System.out.println("Received file: " + file.getOriginalFilename());
-                // Ambil Question
                 Question question = questionRepository.findById(questionId)
                         .orElseThrow(() -> new RuntimeException("Question not found"));
 
-                // Ambil Candidate dari userId
                 Candidate candidate = candidateRepository.findByUserId(userId)
                         .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
-                // Ambil Interview dari Question
                 Interview interview = question.getInterview();
 
-                // Cari atau buat InterviewParticipant
                 InterviewParticipant participant = participantRepository
                         .findByInterviewIdAndCandidateId(interview.getId(), candidate.getId())
                         .orElseGet(() -> {
@@ -63,41 +59,79 @@ public class AnswerServiceImpl implements AnswerService {
                                 return participantRepository.save(newParticipant);
                         });
 
-                // Upload file ke MinIO
+                // Upload ke MinIO
                 String storedFileName = minioService.uploadFile(file);
 
-                // ===============================
-                // Create temp files
-                // ===============================
-                tempVideo = File.createTempFile("video-", ".mp4");
-                tempAudio = File.createTempFile("audio-", ".wav");
-
-                file.transferTo(tempVideo);
-
-                // ===============================
-                // Extract Audio
-                // ===============================
-                Ffmpeg.extractAudio(
-                        tempVideo.getAbsolutePath(),
-                        tempAudio.getAbsolutePath()
-                );
-
-                // ===============================
-                // Send to STT Service
-                // ===============================
-                String transcriptAnswer = sttClient.transcribe(tempAudio);
-
-
-                // Simpan Answer
+                // Save Answer tanpa transcript
                 Answer answer = Answer.builder()
                         .participant(participant)
                         .question(question)
                         .audioPath(storedFileName)
-                        .transcript(transcriptAnswer)
+                        .status(TranscriptStatusEnum.PENDING)
+                        .retryCount(0)
                         .createdAt(LocalDateTime.now())
                         .build();
 
                 answerRepository.save(answer);
+                // System.out.println("Received file: " + file.getOriginalFilename());
+                // // Ambil Question
+                // Question question = questionRepository.findById(questionId)
+                //         .orElseThrow(() -> new RuntimeException("Question not found"));
+
+                // // Ambil Candidate dari userId
+                // Candidate candidate = candidateRepository.findByUserId(userId)
+                //         .orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+                // // Ambil Interview dari Question
+                // Interview interview = question.getInterview();
+
+                // // Cari atau buat InterviewParticipant
+                // InterviewParticipant participant = participantRepository
+                //         .findByInterviewIdAndCandidateId(interview.getId(), candidate.getId())
+                //         .orElseGet(() -> {
+                //                 InterviewParticipant newParticipant = InterviewParticipant.builder()
+                //                         .interview(interview)
+                //                         .candidate(candidate)
+                //                         .startedAt(LocalDateTime.now())
+                //                         .build();
+                //                 return participantRepository.save(newParticipant);
+                //         });
+
+                // // Upload file ke MinIO
+                // String storedFileName = minioService.uploadFile(file);
+
+                // // ===============================
+                // // Create temp files
+                // // ===============================
+                // tempVideo = File.createTempFile("video-", ".mp4");
+                // tempAudio = File.createTempFile("audio-", ".wav");
+
+                // file.transferTo(tempVideo);
+
+                // // ===============================
+                // // Extract Audio
+                // // ===============================
+                // Ffmpeg.extractAudio(
+                //         tempVideo.getAbsolutePath(),
+                //         tempAudio.getAbsolutePath()
+                // );
+
+                // // ===============================
+                // // Send to STT Service
+                // // ===============================
+                // String transcriptAnswer = sttClient.transcribe(tempAudio);
+
+
+                // // Simpan Answer
+                // Answer answer = Answer.builder()
+                //         .participant(participant)
+                //         .question(question)
+                //         .audioPath(storedFileName)
+                //         .transcript(transcriptAnswer)
+                //         .createdAt(LocalDateTime.now())
+                //         .build();
+
+                // answerRepository.save(answer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload answer: " + e.getMessage(), e);
         } finally {
