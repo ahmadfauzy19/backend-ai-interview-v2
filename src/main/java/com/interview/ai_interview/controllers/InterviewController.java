@@ -7,6 +7,8 @@ import com.interview.ai_interview.services.InterviewService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class InterviewController {
 
     private final InterviewService interviewService;
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('INTERVIEWER')")
     @PostMapping
     public InterviewResponse create(
             @Valid @RequestBody CreateInterviewRequest request
