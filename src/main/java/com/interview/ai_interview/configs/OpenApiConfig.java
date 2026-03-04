@@ -1,11 +1,8 @@
 package com.interview.ai_interview.configs;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +16,6 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-
-        final String securitySchemeName = "bearerAuth";
-
         return new OpenAPI()
                 .info(new Info()
                         .title("AI Interview API")
@@ -31,24 +25,6 @@ public class OpenApiConfig {
                 // Production Server
                 .servers(List.of(
                         new Server().url("https://ai-interview.jiwamu.de")
-                ))
-
-                // Global Security Requirement
-                .addSecurityItem(
-                        new SecurityRequirement().addList(securitySchemeName)
-                )
-
-                // JWT Security Scheme
-                .components(
-                        new Components()
-                                .addSecuritySchemes(
-                                        securitySchemeName,
-                                        new SecurityScheme()
-                                                .name(securitySchemeName)
-                                                .type(SecurityScheme.Type.HTTP)
-                                                .scheme("bearer")
-                                                .bearerFormat("JWT")
-                                )
-                );
+                ));
     }
 }
