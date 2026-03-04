@@ -33,20 +33,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.substring(7);
-        String email = jwtSecurity.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
 
-            var userDetails = userDetailsService.loadUserByUsername(email);
+            String email = jwtSecurity.extractEmail(token);
 
-            var authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+                var userDetails = userDetailsService.loadUserByUsername(email);
+
+                var authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+
+        } catch (Exception e) {
+
+            // Token invalid → abaikan saja
+            System.out.println("Invalid JWT: " + e.getMessage());
+
         }
 
         filterChain.doFilter(request, response);
