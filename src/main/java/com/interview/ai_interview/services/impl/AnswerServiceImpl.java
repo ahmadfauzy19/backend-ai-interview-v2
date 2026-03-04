@@ -12,8 +12,6 @@ import com.interview.ai_interview.repositories.InterviewParticipantRepository;
 import com.interview.ai_interview.repositories.QuestionRepository;
 import com.interview.ai_interview.services.AnswerService;
 import com.interview.ai_interview.services.MinioService;
-// import com.interview.ai_interview.utils.Ffmpeg;
-// import com.interview.ai_interview.client.SttClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

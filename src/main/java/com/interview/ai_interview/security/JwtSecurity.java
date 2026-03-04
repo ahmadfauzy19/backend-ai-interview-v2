@@ -14,7 +14,7 @@ import java.util.Map;
 @Service
 public class JwtSecurity {
 
-    private final String SECRET_KEY = "e38ae0d2d610cd929ffd21be85692284";
+    private final String SECRET_KEY = "939f2f19149e02e816fab87981006b396b4c23c4268774832799465f92c9bf55";
     private final long EXPIRATION = 1000 * 60 * 60 * 24; // 24 jam
 
     private Key getSignKey() {
