@@ -9,6 +9,7 @@ public class QuestionAnswerResponse {
 
     private UUID questionId;
     private String questionText;
+    private String answerTranscript;
     private String videoUrl;
     private Float score;
 

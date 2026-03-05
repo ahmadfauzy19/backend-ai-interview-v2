@@ -116,6 +116,7 @@ public class AnswerServiceImpl implements AnswerService {
 
             dto.setQuestionId(a.getQuestion().getId());
             dto.setQuestionText(a.getQuestion().getQuestionText());
+            dto.setAnswerTranscript(a.getTranscript());
 
             dto.setVideoUrl(
                     minioService.getPresignedUrl(a.getAudioPath())
