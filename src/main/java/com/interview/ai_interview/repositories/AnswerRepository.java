@@ -26,4 +26,22 @@ public interface AnswerRepository extends JpaRepository<Answer, UUID> {
     java.util.Optional<Answer> findByIdForUpdate(UUID id);
 
     long countByParticipantIdAndStatusNot(UUID participantId, String status);
+
+    @Query("""
+        SELECT COUNT(a)
+        FROM Answer a
+        WHERE a.participant.id = :participantId
+    """)
+    long countAnswered(UUID participantId);
+
+    @Query("""
+    SELECT a
+    FROM Answer a
+    JOIN FETCH a.question q
+    JOIN FETCH a.participant p
+    JOIN FETCH p.candidate c
+    JOIN FETCH c.user
+    WHERE c.id = :candidateId
+    """)
+    List<Answer> findResultByCandidateId(UUID candidateId);
 }

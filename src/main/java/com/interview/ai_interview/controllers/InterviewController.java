@@ -4,11 +4,14 @@ import com.interview.ai_interview.dto.request.CreateInterviewRequest;
 import com.interview.ai_interview.dto.response.InterviewResponse;
 import com.interview.ai_interview.dto.response.InterviewDetailResponse;
 import com.interview.ai_interview.services.InterviewService;
+import com.interview.ai_interview.utils.CustomUserDetail;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +39,11 @@ public class InterviewController {
 
     @GetMapping
     public List<InterviewResponse> getAll() {
-        return interviewService.getAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetail user = (CustomUserDetail) authentication.getPrincipal();
+
+        UUID userId = user.getId();
+        System.out.println("user :" + userId);
+        return interviewService.getAll(userId);
     }
 }

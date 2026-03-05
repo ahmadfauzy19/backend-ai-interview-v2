@@ -1,5 +1,8 @@
 package com.interview.ai_interview.services.impl;
 
+import com.interview.ai_interview.dto.response.CandidateListProjection;
+import com.interview.ai_interview.dto.response.CandidateResultResponse;
+import com.interview.ai_interview.dto.response.QuestionAnswerResponse;
 import com.interview.ai_interview.models.Answer;
 import com.interview.ai_interview.models.Candidate;
 import com.interview.ai_interview.models.Interview;
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.io.File;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final CandidateRepository candidateRepository;
     private final InterviewParticipantRepository participantRepository;
     private final AnswerRepository answerRepository;
-//     private final SttClient sttClient;
 
     @Override
     @Transactional
@@ -71,65 +74,6 @@ public class AnswerServiceImpl implements AnswerService {
                         .build();
 
                 answerRepository.save(answer);
-                // System.out.println("Received file: " + file.getOriginalFilename());
-                // // Ambil Question
-                // Question question = questionRepository.findById(questionId)
-                //         .orElseThrow(() -> new RuntimeException("Question not found"));
-
-                // // Ambil Candidate dari userId
-                // Candidate candidate = candidateRepository.findByUserId(userId)
-                //         .orElseThrow(() -> new RuntimeException("Candidate not found"));
-
-                // // Ambil Interview dari Question
-                // Interview interview = question.getInterview();
-
-                // // Cari atau buat InterviewParticipant
-                // InterviewParticipant participant = participantRepository
-                //         .findByInterviewIdAndCandidateId(interview.getId(), candidate.getId())
-                //         .orElseGet(() -> {
-                //                 InterviewParticipant newParticipant = InterviewParticipant.builder()
-                //                         .interview(interview)
-                //                         .candidate(candidate)
-                //                         .startedAt(LocalDateTime.now())
-                //                         .build();
-                //                 return participantRepository.save(newParticipant);
-                //         });
-
-                // // Upload file ke MinIO
-                // String storedFileName = minioService.uploadFile(file);
-
-                // // ===============================
-                // // Create temp files
-                // // ===============================
-                // tempVideo = File.createTempFile("video-", ".mp4");
-                // tempAudio = File.createTempFile("audio-", ".wav");
-
-                // file.transferTo(tempVideo);
-
-                // // ===============================
-                // // Extract Audio
-                // // ===============================
-                // Ffmpeg.extractAudio(
-                //         tempVideo.getAbsolutePath(),
-                //         tempAudio.getAbsolutePath()
-                // );
-
-                // // ===============================
-                // // Send to STT Service
-                // // ===============================
-                // String transcriptAnswer = sttClient.transcribe(tempAudio);
-
-
-                // // Simpan Answer
-                // Answer answer = Answer.builder()
-                //         .participant(participant)
-                //         .question(question)
-                //         .audioPath(storedFileName)
-                //         .transcript(transcriptAnswer)
-                //         .createdAt(LocalDateTime.now())
-                //         .build();
-
-                // answerRepository.save(answer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload answer: " + e.getMessage(), e);
         } finally {
@@ -141,6 +85,55 @@ public class AnswerServiceImpl implements AnswerService {
                 tempAudio.delete();
             }
         }
+    }
 
+    @Override
+    public List<CandidateListProjection> getCandidateList() {
+        return participantRepository.getCandidateList();
+    }
+
+    @Override
+    public List<CandidateListProjection> getCandidateListByInterviewId(UUID interviewId) {
+        return participantRepository.findCandidatesByInterviewId(interviewId);
+    }
+
+    
+    @Override
+    public CandidateResultResponse getCandidateResult(UUID candidateId) {
+
+        List<Answer> answers = answerRepository.findResultByCandidateId(candidateId);
+
+        if (answers.isEmpty()) {
+            throw new RuntimeException("Candidate result not found");
+        }
+
+        InterviewParticipant participant = answers.get(0).getParticipant();
+        String name = participant.getCandidate().getUser().getName();
+
+        List<QuestionAnswerResponse> questionAnswers = answers.stream().map(a -> {
+
+            QuestionAnswerResponse dto = new QuestionAnswerResponse();
+
+            dto.setQuestionId(a.getQuestion().getId());
+            dto.setQuestionText(a.getQuestion().getQuestionText());
+
+            dto.setVideoUrl(
+                    minioService.getPresignedUrl(a.getAudioPath())
+            );
+
+            dto.setScore(a.getScore());
+
+            return dto;
+
+        }).toList();
+
+        CandidateResultResponse result = new CandidateResultResponse();
+
+        result.setName(name);
+        result.setTotalScore(participant.getTotalScore());
+        result.setFinalRecommendation(participant.getFinalRecommendation());
+        result.setAnswers(questionAnswers);
+
+        return result;
     }
 }

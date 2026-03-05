@@ -7,11 +7,14 @@ import com.interview.ai_interview.dto.response.GenerateQuestionAiResponse;
 import com.interview.ai_interview.dto.response.InterviewResponse;
 import com.interview.ai_interview.dto.response.QuestionResponse;
 import com.interview.ai_interview.dto.response.InterviewDetailResponse;
+import com.interview.ai_interview.dto.response.InterviewListProjection;
 import com.interview.ai_interview.models.Interview;
+import com.interview.ai_interview.models.InterviewMode;
 import com.interview.ai_interview.models.InterviewStatus;
 import com.interview.ai_interview.models.Question;
 import com.interview.ai_interview.repositories.InterviewRepository;
 import com.interview.ai_interview.repositories.QuestionRepository;
+import com.interview.ai_interview.repositories.CandidateRepository;
 import com.interview.ai_interview.services.GeminiClient;
 import com.interview.ai_interview.services.InterviewService;
 import com.interview.ai_interview.utils.PromtingGenerateQuestion;
@@ -31,6 +34,7 @@ public class InterviewServiceImpl implements InterviewService {
 
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
+    private final CandidateRepository candidateRepository;
     private final ObjectMapper objectMapper;
     private final PromtingGenerateQuestion promtingGenerateQuestion;
     private final GeminiClient geminiClient;
@@ -109,10 +113,30 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    public List<InterviewResponse> getAll() {
-        return interviewRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
+    public List<InterviewResponse> getAll(UUID userId) {
+
+        UUID candidateId = candidateRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Candidate not found"))
+                .getId();
+
+        List<InterviewListProjection> projections =
+                interviewRepository.findAllWithAnswerStatus(candidateId);
+
+        return projections.stream()
+                .map(p -> InterviewResponse.builder()
+                        .id(p.getId())
+                        .name(p.getName())
+                        .context(p.getContext())
+                        .objective(p.getObjective())
+                        .roleTarget(p.getRoleTarget())
+                        .levelTarget(p.getLevelTarget())
+                        .technology(p.getTechnology())
+                        .purpose(Enum.valueOf(InterviewMode.class, p.getPurpose()))
+                        .status(Enum.valueOf(InterviewStatus.class, p.getStatus()))
+                        .createdBy(p.getCreatedBy())
+                        .createdAt(p.getCreatedAt())
+                        .isAnswered(p.getIsAnswered())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -142,6 +166,7 @@ public class InterviewServiceImpl implements InterviewService {
                 .status(interview.getStatus())
                 .createdBy(interview.getCreatedBy())
                 .createdAt(interview.getCreatedAt())
+                .isAnswered(false)
                 .build();
     }
 

@@ -26,4 +26,5 @@ public class InterviewResponse {
     private InterviewStatus status;
     private UUID createdBy;
     private LocalDateTime createdAt;
+    private Boolean isAnswered;
 }

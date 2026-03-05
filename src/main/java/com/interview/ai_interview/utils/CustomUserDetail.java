@@ -9,10 +9,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 public class CustomUserDetail implements UserDetails {
 
     private final User user;
+
+    public UUID getId() {
+        return user.getId();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
