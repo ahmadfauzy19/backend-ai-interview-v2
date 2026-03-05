@@ -12,5 +12,5 @@ public interface InterviewService {
 
     InterviewDetailResponse getById(UUID id);
 
-    List<InterviewResponse> getAll();
+    List<InterviewResponse> getAll(UUID userId);
 }
