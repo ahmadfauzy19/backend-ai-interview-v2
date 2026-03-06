@@ -92,7 +92,7 @@ public class MinioServiceImpl implements MinioService {
                             .build()
             );
 
-            return internalUrl.replace(
+            return internalPresignedUrl.replace(
                 "http://minio:9000/" + bucketName,
                 publicUrl + "/storage"
             );
