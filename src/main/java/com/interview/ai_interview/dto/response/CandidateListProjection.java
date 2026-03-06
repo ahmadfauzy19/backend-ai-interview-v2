@@ -8,6 +8,4 @@ public interface CandidateListProjection {
     UUID getCandidateId();
     String getName();
     LocalDateTime getStartedAt();
-    Integer getTotalCandidate();
-
 }
