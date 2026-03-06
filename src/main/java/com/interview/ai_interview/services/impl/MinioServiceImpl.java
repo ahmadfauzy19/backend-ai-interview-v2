@@ -116,7 +116,9 @@ public class MinioServiceImpl implements MinioService {
             );
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed generate presigned url", e);
+            e.printStackTrace();
+
+            throw new RuntimeException("Failed generate presigned url: " + e.getMessage());
         }
     }
 }
