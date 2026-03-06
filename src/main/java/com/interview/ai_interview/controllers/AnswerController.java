@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.interview.ai_interview.dto.response.CandidateSummaryResponse;
 import com.interview.ai_interview.services.AnswerService;
 import com.interview.ai_interview.services.MinioService;
 import com.interview.ai_interview.utils.CustomUserDetail;
@@ -72,6 +73,13 @@ public class AnswerController {
                 answerService.getCandidateListByInterviewId(interviewId)
         );
     }
+
+        @GetMapping("/candidate-summary/{interviewId}")
+        public CandidateSummaryResponse getCandidateSummary(
+                @PathVariable UUID interviewId) {
+
+                return answerService.getCandidateSummary(interviewId);
+        }
 
     @GetMapping("/download/{fileName}")
     public ResponseEntity<Resource> downloadVideo(

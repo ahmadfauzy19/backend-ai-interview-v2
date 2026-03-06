@@ -2,6 +2,7 @@ package com.interview.ai_interview.services.impl;
 
 import com.interview.ai_interview.dto.response.CandidateListProjection;
 import com.interview.ai_interview.dto.response.CandidateResultResponse;
+import com.interview.ai_interview.dto.response.CandidateSummaryResponse;
 import com.interview.ai_interview.dto.response.QuestionAnswerResponse;
 import com.interview.ai_interview.models.Answer;
 import com.interview.ai_interview.models.Candidate;
@@ -95,6 +96,11 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public List<CandidateListProjection> getCandidateListByInterviewId(UUID interviewId) {
         return participantRepository.findCandidatesByInterviewId(interviewId);
+    }
+
+    @Override
+    public CandidateSummaryResponse getCandidateSummary(UUID interviewId) {
+        return participantRepository.getCandidateSummary(interviewId);
     }
 
     
