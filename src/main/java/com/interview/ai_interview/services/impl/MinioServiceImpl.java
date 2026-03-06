@@ -79,22 +79,40 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
+    // @Override
+    // public String getPresignedUrl(String objectName) {
+
+    //     try {
+    //         String internalPresignedUrl = minioClient.getPresignedObjectUrl(
+    //                 GetPresignedObjectUrlArgs.builder()
+    //                         .method(Method.GET)
+    //                         .bucket(bucketName)
+    //                         .object(objectName)
+    //                         .expiry(60 * 60)
+    //                         .build()
+    //         );
+
+    //         return internalPresignedUrl.replace(
+    //             "http://minio:9000/" + bucketName,
+    //             publicUrl + "/storage"
+    //         );
+
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("Failed generate presigned url", e);
+    //     }
+    // }
     @Override
     public String getPresignedUrl(String objectName) {
 
         try {
-            String internalPresignedUrl = minioClient.getPresignedObjectUrl(
+
+            return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
                             .bucket(bucketName)
                             .object(objectName)
                             .expiry(60 * 60)
                             .build()
-            );
-
-            return internalPresignedUrl.replace(
-                "http://minio:9000/" + bucketName,
-                publicUrl + "/storage"
             );
 
         } catch (Exception e) {
