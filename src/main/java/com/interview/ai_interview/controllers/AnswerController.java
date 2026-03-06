@@ -1,7 +1,11 @@
 package com.interview.ai_interview.controllers;
 
+import java.io.File;
 import java.util.UUID;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.interview.ai_interview.services.AnswerService;
+import com.interview.ai_interview.services.MinioService;
 import com.interview.ai_interview.utils.CustomUserDetail;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class AnswerController {
 
     private final AnswerService answerService;
+    private final MinioService minioService;
 
     @PostMapping(
             value = "/upload",
@@ -65,5 +71,20 @@ public class AnswerController {
         return ResponseEntity.ok(
                 answerService.getCandidateListByInterviewId(interviewId)
         );
+    }
+
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<Resource> downloadVideo(
+            @PathVariable String fileName
+    ) {
+
+        File videoFile = minioService.downloadToTempFile(fileName);
+
+        Resource resource = new FileSystemResource(videoFile);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(resource);
     }
 }

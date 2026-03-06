@@ -58,7 +58,7 @@ public class MinioServiceImpl implements MinioService {
         try {
 
             String tempDir = System.getProperty("java.io.tmpdir");
-            String fileName = "minio-" + UUID.randomUUID() + ".mp4";
+            String fileName = UUID.randomUUID() + ".mp4";
 
             File tempFile = new File(tempDir, fileName);
 
@@ -73,34 +73,11 @@ public class MinioServiceImpl implements MinioService {
             return tempFile;
 
         } catch (Exception e) {
-
-            throw new RuntimeException("Failed to download file from MinIO", e);
-
+             e.printStackTrace();
+            throw new RuntimeException("Failed to download file from MinIO :" + e.getMessage());
         }
     }
 
-    // @Override
-    // public String getPresignedUrl(String objectName) {
-
-    //     try {
-    //         String internalPresignedUrl = minioClient.getPresignedObjectUrl(
-    //                 GetPresignedObjectUrlArgs.builder()
-    //                         .method(Method.GET)
-    //                         .bucket(bucketName)
-    //                         .object(objectName)
-    //                         .expiry(60 * 60)
-    //                         .build()
-    //         );
-
-    //         return internalPresignedUrl.replace(
-    //             "http://minio:9000/" + bucketName,
-    //             publicUrl + "/storage"
-    //         );
-
-    //     } catch (Exception e) {
-    //         throw new RuntimeException("Failed generate presigned url", e);
-    //     }
-    // }
     @Override
     public String getPresignedUrl(String objectName) {
 
@@ -116,7 +93,7 @@ public class MinioServiceImpl implements MinioService {
             );
 
             return url.replace(
-                    "http://minio:9000/" + bucketName,
+                    internalUrl + "/" + bucketName,
                     publicUrl + "/ai-interview"
             );
 
