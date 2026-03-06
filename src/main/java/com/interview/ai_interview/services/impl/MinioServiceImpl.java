@@ -1,18 +1,19 @@
 package com.interview.ai_interview.services.impl;
 
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.http.Method;
-import lombok.RequiredArgsConstructor;
+import java.io.File;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.interview.ai_interview.services.MinioService;
 
-import java.util.UUID;
-import java.io.File;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.http.Method;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,12 @@ public class MinioServiceImpl implements MinioService {
 
     @Value("${minio.bucket}")
     private String bucketName;
+
+    @Value("${minio.url}")
+    private String internalUrl;
+
+    @Value("${minio.public-url}")
+    private String publicUrl;
 
     @Override
     public String uploadFile(MultipartFile file) {
@@ -76,15 +83,17 @@ public class MinioServiceImpl implements MinioService {
     public String getPresignedUrl(String objectName) {
 
         try {
-
-            return minioClient.getPresignedObjectUrl(
+            String internalPresignedUrl = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
                             .bucket(bucketName)
                             .object(objectName)
-                            .expiry(60 * 60) // 1 jam
+                            .expiry(60 * 60)
                             .build()
             );
+
+            // replace internal docker URL → public URL
+            return internalPresignedUrl.replace(internalUrl, publicUrl);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed generate presigned url", e);
