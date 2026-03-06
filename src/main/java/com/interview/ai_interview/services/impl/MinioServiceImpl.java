@@ -106,7 +106,7 @@ public class MinioServiceImpl implements MinioService {
 
         try {
 
-            return minioClient.getPresignedObjectUrl(
+            String url = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
                             .bucket(bucketName)
@@ -115,9 +115,13 @@ public class MinioServiceImpl implements MinioService {
                             .build()
             );
 
+            return url.replace(
+                    "http://minio:9000/" + bucketName,
+                    publicUrl + "/ai-interview"
+            );
+
         } catch (Exception e) {
             e.printStackTrace();
-
             throw new RuntimeException("Failed generate presigned url: " + e.getMessage());
         }
     }
