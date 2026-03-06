@@ -122,6 +122,8 @@ public class AnswerServiceImpl implements AnswerService {
                     minioService.getPresignedUrl(a.getAudioPath())
             );
 
+            dto.setFileName(a.getAudioPath());
+
             dto.setScore(a.getScore());
 
             return dto;

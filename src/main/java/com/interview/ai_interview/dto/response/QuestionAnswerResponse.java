@@ -11,6 +11,7 @@ public class QuestionAnswerResponse {
     private String questionText;
     private String answerTranscript;
     private String videoUrl;
+    private String fileName;
     private Float score;
 
 }
