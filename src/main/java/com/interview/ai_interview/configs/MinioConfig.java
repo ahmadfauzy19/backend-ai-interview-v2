@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MinioConfig {
 
-    @Value("${minio.public-url}")
+    @Value("${minio.url}")
     private String url;
 
     @Value("${minio.access-key}")
