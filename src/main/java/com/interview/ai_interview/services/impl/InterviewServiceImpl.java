@@ -1,32 +1,36 @@
 package com.interview.ai_interview.services.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.interview.ai_interview.dto.request.CreateInterviewRequest;
-import com.interview.ai_interview.dto.request.GenerateQuestionRequest;
-import com.interview.ai_interview.dto.response.GenerateQuestionAiResponse;
-import com.interview.ai_interview.dto.response.InterviewResponse;
-import com.interview.ai_interview.dto.response.QuestionResponse;
-import com.interview.ai_interview.dto.response.InterviewDetailResponse;
-import com.interview.ai_interview.dto.response.InterviewListProjection;
-import com.interview.ai_interview.models.Interview;
-import com.interview.ai_interview.models.InterviewMode;
-import com.interview.ai_interview.models.InterviewStatus;
-import com.interview.ai_interview.models.Question;
-import com.interview.ai_interview.repositories.InterviewRepository;
-import com.interview.ai_interview.repositories.QuestionRepository;
-import com.interview.ai_interview.repositories.CandidateRepository;
-import com.interview.ai_interview.services.GeminiClient;
-import com.interview.ai_interview.services.InterviewService;
-import com.interview.ai_interview.utils.PromtingGenerateQuestion;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.interview.ai_interview.dto.request.CreateInterviewRequest;
+import com.interview.ai_interview.dto.request.GenerateQuestionRequest;
+import com.interview.ai_interview.dto.response.GenerateQuestionAiResponse;
+import com.interview.ai_interview.dto.response.InterviewDetailResponse;
+import com.interview.ai_interview.dto.response.InterviewListProjection;
+import com.interview.ai_interview.dto.response.InterviewResponse;
+import com.interview.ai_interview.dto.response.QuestionResponse;
+import com.interview.ai_interview.models.Interview;
+import com.interview.ai_interview.models.InterviewMode;
+import com.interview.ai_interview.models.InterviewStatus;
+import com.interview.ai_interview.models.Question;
+import com.interview.ai_interview.models.Candidate;
+import com.interview.ai_interview.repositories.CandidateRepository;
+import com.interview.ai_interview.repositories.InterviewRepository;
+import com.interview.ai_interview.repositories.QuestionRepository;
+import com.interview.ai_interview.services.GeminiClient;
+import com.interview.ai_interview.services.InterviewService;
+import com.interview.ai_interview.utils.PromtingGenerateQuestion;
+
+import lombok.RequiredArgsConstructor;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -115,12 +119,17 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     public List<InterviewResponse> getAll(UUID userId) {
 
-        UUID candidateId = candidateRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"))
-                .getId();
+        Optional<Candidate> candidateOpt = candidateRepository.findByUserId(userId);
 
-        List<InterviewListProjection> projections =
-                interviewRepository.findAllWithAnswerStatus(candidateId);
+        UUID candidateId = candidateOpt.map(Candidate::getId).orElse(null);
+
+        List<InterviewListProjection> projections;
+
+        if (candidateId != null) {
+            projections = interviewRepository.findAllWithAnswerStatus(candidateId);
+        } else {
+            projections = interviewRepository.findAllWithoutCandidate();
+        }
 
         return projections.stream()
                 .map(p -> InterviewResponse.builder()

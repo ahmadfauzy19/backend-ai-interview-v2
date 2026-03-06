@@ -49,4 +49,21 @@ public interface InterviewRepository extends JpaRepository<Interview, UUID> {
     ORDER BY i.created_at DESC
     """, nativeQuery = true)
     List<InterviewListProjection> findAllWithAnswerStatus(UUID candidateId);
+    @Query("""
+    SELECT
+        i.id as id,
+        i.name as name,
+        i.context as context,
+        i.objective as objective,
+        i.roleTarget as roleTarget,
+        i.levelTarget as levelTarget,
+        i.technology as technology,
+        i.purpose as purpose,
+        i.status as status,
+        i.createdBy as createdBy,
+        i.createdAt as createdAt,
+        false as isAnswered
+    FROM Interview i
+    """)
+    List<InterviewListProjection> findAllWithoutCandidate();
 }
