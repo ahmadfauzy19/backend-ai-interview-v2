@@ -13,20 +13,26 @@ public class CreateInterviewRequest {
     private String name;
 
     @NotBlank
-    private String description;
+    private String context;
 
     @NotBlank
     private String objective;
 
     @NotNull
-    private InterviewMode mode;
+    private InterviewMode purpose;
 
     @NotNull
     private UUID createdBy;
 
     @NotBlank
-    private String role_target;
+    private String roleTarget;
 
     @NotBlank
-    private String level_target;
+    private String levelTarget;
+
+    @NotBlank
+    private String technology;
+
+    @NotNull
+    private Number number;
 }
