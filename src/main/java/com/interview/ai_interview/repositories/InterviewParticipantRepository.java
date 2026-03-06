@@ -33,6 +33,7 @@ public interface InterviewParticipantRepository
         c.id as candidateId,
         u.name as name,
         p.startedAt as startedAt
+        COUNT(c.id) as totalCandidate
     FROM InterviewParticipant p
     JOIN p.candidate c
     JOIN c.user u
