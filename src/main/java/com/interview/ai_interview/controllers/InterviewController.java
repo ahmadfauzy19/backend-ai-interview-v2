@@ -43,7 +43,6 @@ public class InterviewController {
         CustomUserDetail user = (CustomUserDetail) authentication.getPrincipal();
 
         UUID userId = user.getId();
-        System.out.println("user :" + userId);
         return interviewService.getAll(userId);
     }
 }
