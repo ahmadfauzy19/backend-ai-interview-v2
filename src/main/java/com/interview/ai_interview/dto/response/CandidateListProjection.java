@@ -7,5 +7,7 @@ public interface CandidateListProjection {
 
     UUID getCandidateId();
     String getName();
+    Float getTotalScore();
+    String getFinalRecommendation();
     LocalDateTime getStartedAt();
 }
