@@ -16,7 +16,7 @@ import com.interview.ai_interview.models.InterviewParticipant;
 public interface InterviewParticipantRepository
         extends JpaRepository<InterviewParticipant, UUID> {
     Optional<InterviewParticipant> findByInterviewIdAndCandidateId(UUID interviewId, UUID candidateId);
-    Optional<InterviewParticipant> findByInterview_Id(UUID interviewId);
+    List<InterviewParticipant> findByInterviewId(UUID interviewId);
     @Query("""
     SELECT
         c.id as candidateId,
