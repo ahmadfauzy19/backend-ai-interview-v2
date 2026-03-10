@@ -119,6 +119,7 @@ Jika semua jawaban kosong, totalScore = 0 dan recommendation mengikuti aturan.
   "questionResults": [
     {
       "questionId": "string",
+      "answerId": "string",
       "score": 0,
       "kategori": "Sangat Kuat | Baik | Cukup | Lemah | Buruk",
       "kelebihan": "string",

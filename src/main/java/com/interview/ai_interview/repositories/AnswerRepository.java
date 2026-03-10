@@ -1,6 +1,8 @@
 package com.interview.ai_interview.repositories;
 
+import com.interview.ai_interview.dto.response.PendingAnswerResponse;
 import com.interview.ai_interview.models.Answer;
+import com.interview.ai_interview.models.TranscriptStatusEnum;
 
 import jakarta.persistence.LockModeType;
 
@@ -25,23 +27,42 @@ public interface AnswerRepository extends JpaRepository<Answer, UUID> {
     @Query("SELECT a FROM Answer a WHERE a.id = :id")
     java.util.Optional<Answer> findByIdForUpdate(UUID id);
 
-    long countByParticipantIdAndStatusNot(UUID participantId, String status);
-
     @Query("""
         SELECT COUNT(a)
         FROM Answer a
         WHERE a.participant.id = :participantId
     """)
     long countAnswered(UUID participantId);
-
+    
     @Query("""
-    SELECT a
-    FROM Answer a
-    JOIN FETCH a.question q
-    JOIN FETCH a.participant p
-    JOIN FETCH p.candidate c
-    JOIN FETCH c.user
-    WHERE c.id = :candidateId
+        SELECT a
+        FROM Answer a
+        JOIN FETCH a.question q
+        JOIN FETCH a.participant p
+        JOIN FETCH p.candidate c
+        JOIN FETCH c.user
+        WHERE c.id = :candidateId
     """)
     List<Answer> findResultByCandidateId(UUID candidateId);
+
+    long countByParticipantIdAndStatus(UUID participantId, TranscriptStatusEnum status);
+
+    @Query("""
+        SELECT new com.interview.ai_interview.dto.response.PendingAnswerResponse(
+            gj.id,
+            a.id,
+            ip.id,
+            ip.interview.id,
+            ip.interview,
+            q.questionText,
+            a.transcript
+        )
+        FROM GradingJob gj
+        JOIN gj.participant ip
+        JOIN Answer a ON a.participant.id = ip.id
+        JOIN Question q ON a.question.id = q.id
+        WHERE gj.status = com.interview.ai_interview.models.GradingStatusEnum.PENDING
+          AND a.status = com.interview.ai_interview.models.TranscriptStatusEnum.DONE
+    """)
+    List<PendingAnswerResponse> findAllAnswersForPendingJobs();
 }
