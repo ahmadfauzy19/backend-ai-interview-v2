@@ -52,4 +52,8 @@ public interface InterviewParticipantRepository
     WHERE p.interview.id = :interviewId
     """)
     CandidateSummaryResponse getCandidateSummary(UUID interviewId);
+
+    @Query("SELECT ip FROM InterviewParticipant ip WHERE NOT EXISTS " +
+           "(SELECT gj FROM GradingJob gj WHERE gj.participant = ip)")
+    List<InterviewParticipant> findParticipantsWithoutGradingJob();
 }
