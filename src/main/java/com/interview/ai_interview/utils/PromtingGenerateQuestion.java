@@ -41,6 +41,7 @@ public class PromtingGenerateQuestion {
                 
                 Jangan tambahkan markdown.
                 Jangan tambahkan komentar.
+                WAJIB MENGGUNAKAN BAHASA INDONESIA.
                 """.formatted(
                 body.getNumber(),
                 body.getName(),
