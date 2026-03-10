@@ -53,7 +53,7 @@ public class GradingServiceJob {
                         System.out.println("Creating grading job for participant ID: " + participant.getId());
                         createJob(participant.getId());
                     }else{
-                        return;
+                        continue;
                     }
                     
                 } catch (Exception e) {

@@ -1,8 +1,5 @@
 package com.interview.ai_interview.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.interview.ai_interview.models.Interview;
-
 import lombok.Builder;
 import lombok.Data;
 
