@@ -39,11 +39,16 @@ public interface AnswerRepository extends JpaRepository<Answer, UUID> {
         FROM Answer a
         JOIN FETCH a.question q
         JOIN FETCH a.participant p
+        JOIN FETCH p.interview i
         JOIN FETCH p.candidate c
-        JOIN FETCH c.user
+        JOIN FETCH c.user u
         WHERE c.id = :candidateId
+        AND i.id = :interviewId
     """)
-    List<Answer> findResultByCandidateId(UUID candidateId);
+    List<Answer> findResultByCandidateAndInterview(
+        UUID candidateId,
+        UUID interviewId
+    );
 
     long countByParticipantIdAndStatus(UUID participantId, TranscriptStatusEnum status);
 

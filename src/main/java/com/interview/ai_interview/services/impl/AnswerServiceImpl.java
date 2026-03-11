@@ -105,9 +105,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     
     @Override
-    public CandidateResultResponse getCandidateResult(UUID candidateId) {
+    public CandidateResultResponse getCandidateResult(UUID candidateId, UUID interviewId) {
 
-        List<Answer> answers = answerRepository.findResultByCandidateId(candidateId);
+        List<Answer> answers = answerRepository.findResultByCandidateAndInterview(candidateId, interviewId);
 
         if (answers.isEmpty()) {
             throw new RuntimeException("Candidate result not found");

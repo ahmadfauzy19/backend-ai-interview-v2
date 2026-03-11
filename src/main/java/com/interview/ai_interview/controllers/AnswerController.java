@@ -57,11 +57,12 @@ public class AnswerController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('INTERVIEWER')")
-    @GetMapping("/candidate-result/{candidateId}")
+    @GetMapping("/candidate-result/{interviewId}/{candidateId}")
     public ResponseEntity<?> candidateResult(
-            @PathVariable UUID candidateId
+            @PathVariable UUID candidateId,
+            @PathVariable UUID interviewId
     ) {
-        return ResponseEntity.ok(answerService.getCandidateResult(candidateId));
+        return ResponseEntity.ok(answerService.getCandidateResult(candidateId, interviewId));
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('INTERVIEWER')")
