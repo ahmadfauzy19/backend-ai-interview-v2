@@ -42,7 +42,15 @@ public class Answer {
     @Column(nullable = false)
     private Integer retryCount;
 
-    private Float score;
+    private Float technicalFundamentalScore;
+
+    private Float problemSolvingScore;
+
+    private Float communicationScore;
+
+    private String breakTime;
+
+    private String answerTime;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

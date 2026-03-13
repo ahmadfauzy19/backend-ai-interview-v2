@@ -32,7 +32,10 @@ public class InterviewParticipant {
 
     private Float totalScore;
 
-    private String finalRecommendation;
+    private String recommendation;
+
+    @Column(columnDefinition = "TEXT")
+    private String summaryReason;
 
     private LocalDateTime startedAt;
 

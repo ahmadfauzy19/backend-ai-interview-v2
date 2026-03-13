@@ -12,6 +12,9 @@ public class QuestionAnswerResponse {
     private String answerTranscript;
     private String videoUrl;
     private String fileName;
-    private Float score;
-
+    private Float technicalFundamentalScore;
+    private Float problemSolvingScore;
+    private Float communicationScore;
+    private String breakTime;
+    private String answerTime;
 }

@@ -41,13 +41,15 @@ public class AnswerController {
     )
     public ResponseEntity<String> uploadAnswer(
             @RequestParam("video") MultipartFile video,
-            @RequestParam("questionId") UUID questionId
+            @RequestParam("questionId") UUID questionId,
+            @RequestParam("breakTime") String breakTime,
+            @RequestParam("answerTime") String answerTime
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetail user = (CustomUserDetail) authentication.getPrincipal();
 
         UUID userId = user.getId();
-        answerService.uploadAnswer(video, questionId, userId);
+        answerService.uploadAnswer(video, questionId, userId, breakTime, answerTime);
         return ResponseEntity.ok("Berhasil upload jawaban");
     }
 
