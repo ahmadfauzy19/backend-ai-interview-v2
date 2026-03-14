@@ -38,7 +38,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     @Transactional
-    public void uploadAnswer(MultipartFile file, UUID questionId, UUID userId) {
+    public void uploadAnswer(MultipartFile file, UUID questionId, UUID userId, String breakTime, String answerTime) {
         File tempVideo = null;
         File tempAudio = null;
         try {
@@ -69,6 +69,8 @@ public class AnswerServiceImpl implements AnswerService {
                         .participant(participant)
                         .question(question)
                         .audioPath(storedFileName)
+                        .breakTime(breakTime)
+                        .answerTime(answerTime)
                         .status(TranscriptStatusEnum.PENDING)
                         .retryCount(0)
                         .createdAt(LocalDateTime.now())
@@ -130,8 +132,11 @@ public class AnswerServiceImpl implements AnswerService {
 
             dto.setFileName(a.getAudioPath());
 
-            dto.setScore(a.getScore());
-
+            dto.setTechnicalFundamentalScore(a.getTechnicalFundamentalScore());
+            dto.setProblemSolvingScore(a.getProblemSolvingScore());
+            dto.setCommunicationScore(a.getCommunicationScore());
+            dto.setBreakTime(a.getBreakTime());
+            dto.setAnswerTime(a.getAnswerTime());
             return dto;
 
         }).toList();
@@ -140,7 +145,8 @@ public class AnswerServiceImpl implements AnswerService {
 
         result.setName(name);
         result.setTotalScore(participant.getTotalScore());
-        result.setFinalRecommendation(participant.getFinalRecommendation());
+        result.setRecommendation(participant.getRecommendation());
+        result.setSummaryReason(participant.getSummaryReason());
         result.setAnswers(questionAnswers);
 
         return result;

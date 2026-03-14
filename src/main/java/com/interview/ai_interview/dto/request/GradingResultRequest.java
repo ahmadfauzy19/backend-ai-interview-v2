@@ -24,7 +24,9 @@ public class GradingResultRequest {
     public static class QuestionResult {
         private String questionId;
         private String answerId;
-        private Integer score;
+        private Float technicalFundamentalScore;
+        private Float problemSolvingScore;
+        private Float communicationScore;
         private String kategori;
         private String kelebihan;
         private String kekurangan;

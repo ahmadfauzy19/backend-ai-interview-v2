@@ -14,7 +14,9 @@ import com.interview.ai_interview.models.GradingStatusEnum;
 import com.interview.ai_interview.models.InterviewParticipant;
 import com.interview.ai_interview.models.TranscriptStatusEnum;
 import com.interview.ai_interview.dto.response.PendingAnswerResponse;
+import com.interview.ai_interview.models.CategoryScore;
 import com.interview.ai_interview.repositories.AnswerRepository;
+import com.interview.ai_interview.repositories.CategoryScoreRepository;
 import com.interview.ai_interview.repositories.GradingJobRepository;
 import com.interview.ai_interview.repositories.InterviewParticipantRepository;
 import com.interview.ai_interview.services.GeminiClient;
@@ -39,6 +41,7 @@ public class GradingProcessorJob {
     private final AnswerRepository answerRepository;
     private final InterviewParticipantRepository participantRepository;
     private final GradingJobRepository gradingJobRepository;
+    private final CategoryScoreRepository categoryScoreRepository;
 
     public void processAllPendingGrading() {
         List<PendingAnswerResponse> allPending = answerRepository.findAllAnswersForPendingJobs();
@@ -95,20 +98,51 @@ public class GradingProcessorJob {
 
     @Transactional
     public void saveGradingResult(GradingResultRequest result, UUID participantId, UUID jobId) {
-        // 1. Update Score per Jawaban
+        
+        // 1. Ambil score kategori dari tabel category_scores
+        List<CategoryScore> categories = categoryScoreRepository.findAll();
+        Map<String, Float> scoreMap = categories.stream()
+                .collect(Collectors.toMap(
+                        cs -> cs.getCategory().toLowerCase().trim(),
+                        CategoryScore::getScore));
+
+        float scoreTF = scoreMap.getOrDefault("technical fundamental", 50f);
+        float scorePS = scoreMap.getOrDefault("problem solving", 30f);
+        float scoreComm = scoreMap.getOrDefault("communication", 20f);
+        float totalscore = scoreTF + scorePS + scoreComm;
+
+        // 2. Update Score per Jawaban & hitung weighted score
+        float totalWeightedScore = 0f;
+        int answerCount = 0;
+
         for (QuestionResult res : result.getQuestionResults()) {
             Answer updatedAnswer = answerRepository.findById(UUID.fromString(res.getAnswerId())).orElseThrow();
-            updatedAnswer.setScore(res.getScore().floatValue());
+            updatedAnswer.setTechnicalFundamentalScore(res.getTechnicalFundamentalScore());
+            updatedAnswer.setProblemSolvingScore(res.getProblemSolvingScore());
+            updatedAnswer.setCommunicationScore(res.getCommunicationScore());
             updatedAnswer.setStatus(TranscriptStatusEnum.DONE);
 
             answerRepository.save(updatedAnswer);
+
+            // Hitung weighted score per answer
+            float tf = res.getTechnicalFundamentalScore() != null ? res.getTechnicalFundamentalScore() : 0f;
+            float ps = res.getProblemSolvingScore() != null ? res.getProblemSolvingScore() : 0f;
+            float comm = res.getCommunicationScore() != null ? res.getCommunicationScore() : 0f;
+
+            float weightedScore = ((tf * scoreTF) + (ps * scorePS) + (comm * scoreComm)) / totalscore;
+            totalWeightedScore += weightedScore;
+            answerCount++;
         }
 
-        // 2. Update Total Score di Participant
+        // 3. Hitung rata-rata weighted score
+        float averageScore = answerCount > 0 ? totalWeightedScore / answerCount : 0f;
+
+        // 4. Update Total Score di Participant
         InterviewParticipant participant = participantRepository.findById(participantId).orElseThrow();
-        participant.setTotalScore(result.getTotalScore().floatValue());
-        participant.setFinalRecommendation(
-                result.getRecommendation().getDecision() + ": " + result.getRecommendation().getReason());
+        participant.setTotalScore(averageScore);
+        participant.setRecommendation(
+                result.getRecommendation().getDecision());
+        participant.setSummaryReason(result.getRecommendation().getReason());
         participant.setFinishedAt(java.time.LocalDateTime.now());
 
         participantRepository.save(participant);

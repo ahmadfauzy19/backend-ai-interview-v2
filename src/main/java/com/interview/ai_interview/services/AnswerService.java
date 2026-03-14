@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AnswerService {
-    void uploadAnswer(MultipartFile video, UUID questionId, UUID userId);
+    void uploadAnswer(MultipartFile video, UUID questionId, UUID userId, String breakTime, String answerTime);
     List<CandidateListProjection> getCandidateList();
     CandidateResultResponse getCandidateResult(UUID candidateId, UUID interviewId);
     CandidateSummaryResponse getCandidateSummary(UUID interviewId);

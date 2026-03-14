@@ -34,7 +34,8 @@ public interface InterviewParticipantRepository
         c.id as candidateId,
         u.name as name,
         p.totalScore as totalScore,
-        p.finalRecommendation as finalRecommendation,
+        p.recommendation as recommendation,
+        p.summaryReason as summaryReason,
         p.startedAt as startedAt
     FROM InterviewParticipant p
     JOIN p.candidate c
